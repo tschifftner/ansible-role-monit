@@ -16,6 +16,15 @@
     mode: 0700
   notify: reload monit
 
+- name: symlink monitrc to /etc/monit/
+  file:
+    src: /etc/monitrc
+    dest: /etc/monit/monitrc
+    owner: root
+    group: root
+    mode: 0700
+    state: link
+
 - name: set webinterface config
   template:
     src: webinterface.j2

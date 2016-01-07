@@ -37,6 +37,9 @@ script:
   # ansible-lint checks for best practice
   - ansible-lint tests/$SITE
 
+  # workaround for ubuntu (ansible starts properly with 2.0 only!)
+  - monit start
+
   # Check if monit is reachable
   - curl http://admin:monit@127.0.0.1:2812/
 

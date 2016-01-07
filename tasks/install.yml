@@ -23,7 +23,7 @@
   get_url:
     url: '{{monit_download_url }}'
     dest: '{{ monit_workspace }}/monit-latest.tar.gz'
-  when: "{{ monit_version != monit_current_version_output }}"
+  when: monit_version != monit_current_version_output
 
 - name: 'Unarchive monit-latest.tar.gz'
   register: monit_unarchive
@@ -35,7 +35,6 @@
 
 - name: 'Copy'
   shell: cp {{ monit_unarchive_dir }}/bin/monit /usr/local/bin/monit
-  notify: start monit
   when: monit_unarchive.changed
 
 - name: 'Set monit default'
@@ -52,8 +51,18 @@
     dest: /etc/init.d/monit
     owner: root
     group: root
-    mode: 0751
+    mode: 0755
   when: ansible_distribution == 'Ubuntu'
+
+#- name: 'Set upstart script'
+#  copy:
+#    src: monit.upstart
+#    dest: /etc/init.d/monit.conf
+#    owner: root
+#    group: root
+#    mode: 0755
+#  notify: reload initctl
+#  when: ansible_distribution == 'Ubuntu'
 
 - name: 'Set systemd unit file'
   copy:
@@ -73,3 +82,9 @@
     group: root
     mode: 0755
   when: monit_use_slack
+
+- name: start monit
+  service:
+    name: 'monit'
+    state: started
+    enabled: yes
