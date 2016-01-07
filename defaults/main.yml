@@ -1,0 +1,27 @@
+---
+# Download
+monit_version: "5.15"
+monit_download_url: 'https://bitbucket.org/tildeslash/monit/downloads/monit-5.15-linux-x64.tar.gz'
+
+# Mailserver
+monit_mail_enabled: false
+monit_mailserver_host: localhost
+monit_mailserver_port: 25
+
+# Webinterface
+monit_webinterface_enabled: true
+monit_webinterface_bind: 0.0.0.0
+monit_webinterface_port: 2812
+monit_webinterface_acl_rules:
+  - "admin:monit"
+
+# MMonit collector
+# for example https://monituser:p455w0rd@your-server.com:2811/collector
+mmonit_collector: ''
+
+# If endabled, all alerts are send to slack
+monit_use_slack: false
+monit_slack_url: 'https://YYYYY.slack.com/services/hooks/incoming-webhook?token=XXXXX'
+
+# Services
+monit_services: []

@@ -1,0 +1,19 @@
+---
+- name: start monit
+  service:
+    name: 'monit'
+    state: started
+    enabled: yes
+
+- name: reload monit
+  notify: check monit
+  service:
+    name: 'monit'
+    state: reloaded
+    enabled: yes
+
+- name: reload systemd
+  command: systemctl daemon-reload
+
+- name: check monit
+  shell: "monit --version | grep 'This is Monit version {{ monit_version }}'"

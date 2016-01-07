@@ -1,0 +1,18 @@
+# {{ ansible_managed }}
+
+set daemon {{ monit_interval }}
+set logfile {{ monit_log_file }}
+set statefile {{ monit_state_file }}
+set idfile {{ monit_id_file }}
+
+{% if monit_eventqueue_dir is defined %}
+set eventqueue
+  basedir {{ monit_eventqueue_dir | default('/var/lib/monit/events') }}
+  slots {{ monit_eventqueue_slots | default(100) }}
+{% endif %}
+
+{% if mmonit_collector %}
+set mmonit {{ mmonit_collector }}
+{% endif %}
+
+include {{ monit_include_dir }}/*

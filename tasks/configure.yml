@@ -1,0 +1,36 @@
+---
+- name: create monit include folder
+  file:
+    path: "{{ monit_include_dir }}"
+    state: directory
+    mode: 0600
+  with_items:
+    - "{{ monit_include_dir }}"
+
+- name: set monitrc config
+  template:
+    src: monitrc.j2
+    dest: "{{ monitrc_conf_file }}"
+    owner: root
+    group: root
+    mode: 0700
+  notify: reload monit
+
+- name: set webinterface config
+  template:
+    src: webinterface.j2
+    dest: "{{ monit_include_dir }}/webinterface"
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload monit
+
+- name: define mail alerts
+  template:
+    src: mail.j2
+    dest: "{{ monit_include_dir }}/mail"
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload monit
+  when: monit_mail_enabled

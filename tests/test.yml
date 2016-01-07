@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  remote_user: root
+
+  vars:
+    install_geoip: false
+
+  roles:
+    - ansible-role-nginx

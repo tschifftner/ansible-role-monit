@@ -1,0 +1,15 @@
+---
+# Paths
+monit_workspace: '/opt'
+monitrc_conf_file: '/etc/monitrc'
+monit_include_dir: '/etc/monit/conf.d'
+monit_log_file: '/var/log/monit.log'
+monit_state_file: '/var/.monit.state'
+monit_id_file: '/var/.monit.id'
+monit_slack_script: '/usr/local/bin/slack.rb'
+
+# Settings
+monit_interval: 60
+
+# Services
+monit_service_delete_unlisted: true

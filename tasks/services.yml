@@ -1,0 +1,24 @@
+---
+- name: define monit services
+  template:
+    src: service.j2
+    dest: "{{ monit_include_dir }}/{{ item.name }}"
+    owner: root
+    group: root
+  with_items: monit_services
+  notify: reload monit
+
+- name: 'Get all sevices from file system'
+  shell: ls -1 {{ monit_include_dir }}
+  register: defined_monit_services
+  changed_when: false
+
+- set_fact:
+    active_monit_services: "{{ monit_services | selectattr('name', 'string') | map(attribute='name') | list }}"
+
+- name: Remove obsolete monit services
+  file:
+    path: "{{ monit_include_dir }}/{{ item }}"
+    state: absent
+  when: "{{ monit_service_delete_unlisted and item not in active_monit_services and item not in ['webinterface', 'mail'] }}"
+  with_items: defined_monit_services.stdout_lines
