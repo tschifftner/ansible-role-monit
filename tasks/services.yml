@@ -20,5 +20,5 @@
   file:
     path: "{{ monit_include_dir }}/{{ item }}"
     state: absent
-  when: "{{ monit_service_delete_unlisted and item not in active_monit_services and item not in ['webinterface', 'mail'] }}"
+  when: "monit_service_delete_unlisted and item not in active_monit_services and item not in ['webinterface', 'mail']"
   with_items: defined_monit_services.stdout_lines

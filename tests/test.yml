@@ -7,8 +7,8 @@
       - name: ssh
         type: process
         target: /var/run/sshd.pid
-        start: service ssh start
-        stop: service ssh stop
+        start: /usr/sbin/service ssh start
+        stop: /usr/sbin/service ssh stop
         rules:
           - if failed port 22 protocol ssh then restart
           - if 5 restarts within 5 cycles then alert
