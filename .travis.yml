@@ -1,6 +1,8 @@
 ---
 language: python
 python: "2.7"
+sudo: required
+dist: trusty
 
 env:
   - SITE=test.yml ANSIBLE_VERSION=1.8
@@ -38,7 +40,7 @@ script:
   - ansible-lint tests/$SITE
 
   # workaround for ubuntu (ansible starts properly with 2.0 only!)
-  - monit start
+  - monit start && sleep 5
 
   # Check if monit is reachable
   - curl http://admin:monit@127.0.0.1:2812/
@@ -46,7 +48,7 @@ script:
 after_failure:
   - sudo service monit status
   - sudo monit status
-  - sudo monit verify
+  - sudo monit validate
 
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
