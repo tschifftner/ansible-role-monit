@@ -47,3 +47,6 @@ after_failure:
   - sudo service monit status
   - sudo monit status
   - sudo monit verify
+
+notifications:
+  slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6

@@ -54,15 +54,15 @@
     mode: 0755
   when: ansible_distribution == 'Ubuntu'
 
-#- name: 'Set upstart script'
-#  copy:
-#    src: monit.upstart
-#    dest: /etc/init.d/monit.conf
-#    owner: root
-#    group: root
-#    mode: 0755
-#  notify: reload initctl
-#  when: ansible_distribution == 'Ubuntu'
+- name: 'Set upstart script'
+  copy:
+    src: monit.upstart
+    dest: /etc/init/monit.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload initctl
+  when: ansible_distribution == 'Ubuntu'
 
 - name: 'Set systemd unit file'
   copy:
