@@ -39,9 +39,6 @@ script:
   # ansible-lint checks for best practice
   - ansible-lint tests/$SITE
 
-  # workaround for ubuntu (ansible starts properly with 2.0 only!)
-  - monit start && sleep 5
-
   # Check if monit is reachable
   - curl http://admin:monit@127.0.0.1:2812/
 
@@ -49,6 +46,7 @@ after_failure:
   - sudo service monit status
   - sudo monit status
   - sudo monit validate
+  - sudo cat /etc/default/monit
 
 notifications:
   slack: ambimax:2MlPTX9bY9aPxCPhJGxHKIT6
