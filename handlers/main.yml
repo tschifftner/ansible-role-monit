@@ -6,11 +6,11 @@
     state: started
     enabled: yes
 
-- name: reload monit
+- name: restart monit
   notify: check monit
   service:
     name: 'monit'
-    state: reloaded
+    state: restarted
     enabled: yes
 
 - name: reload systemd

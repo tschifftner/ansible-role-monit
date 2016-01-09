@@ -14,7 +14,7 @@
     owner: root
     group: root
     mode: 0700
-  notify: reload monit
+  notify: restart monit
 
 - name: symlink monitrc to /etc/monit/
   file:
@@ -32,7 +32,7 @@
     owner: root
     group: root
     mode: 0644
-  notify: reload monit
+  notify: restart monit
 
 - name: define mail alerts
   template:
@@ -41,5 +41,5 @@
     owner: root
     group: root
     mode: 0644
-  notify: reload monit
+  notify: restart monit
   when: monit_mail_enabled

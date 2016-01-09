@@ -6,7 +6,7 @@
     owner: root
     group: root
   with_items: monit_services
-  notify: reload monit
+  notify: restart monit
 
 - name: 'Get all sevices from file system'
   shell: ls -1 {{ monit_include_dir }}
