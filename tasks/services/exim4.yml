@@ -1,7 +1,7 @@
 ---
 - name: Check if exim is installed
   register: _monit_check_exim
-  shell: exim --version
+  command: exim --version
   ignore_errors: true
   changed_when: false
 

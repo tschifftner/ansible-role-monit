@@ -1,7 +1,7 @@
 ---
 - name: Check if fail2ban is installed
   register: _monit_check_fail2ban
-  shell: fail2ban-client --version
+  command: fail2ban-client --version
   ignore_errors: true
   changed_when: false
 
