@@ -1,13 +1,17 @@
 ---
 - name: start monit
-  notify: check monit
   service:
     name: 'monit'
     state: started
     enabled: yes
 
 - name: restart monit
-  notify: check monit
+  service:
+    name: 'monit'
+    state: restarted
+    enabled: yes
+
+- name: reload monit
   service:
     name: 'monit'
     state: restarted
@@ -19,5 +23,10 @@
 - name: reload initctl
   command: initctl reload-configuration
 
-- name: check monit
-  shell: "monit --version | grep 'This is Monit version {{ monit_version }}'"
+- name: check and restart monit
+  shell: "monit -t | grep 'Control file syntax OK'"
+  notify: restart monit
+
+- name: check and reload monit
+  shell: "monit -t | grep 'Control file syntax OK'"
+  notify: reload monit

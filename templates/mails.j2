@@ -7,8 +7,15 @@ set mailserver {{ monit_mailserver_host }} port {{ monit_mailserver_port }}
   {% endif -%}
   with timeout {{ monit_mailserver_timeout | default(5) }} seconds
 
+{% if monit_alert_address is defined and monit_alert_address != '' %}
+set alert {{ monit_alert_address }} not on { instance, action } with reminder on 180 cycles
+{% endif %}
 
-set alert {{ monit_alert_address }}
+{% if monit_alert_addresses is defined %}
+{% for address in monit_alert_addresses %}
+set alert {{ address }} {%- if address.cycle is defined %} with reminder on {{ address.cycle }} cycles{% endif %}
+{% endfor %}
+{% endif %}
 
 {% if monit_alert_mail_format is defined -%}
 set mail-format {

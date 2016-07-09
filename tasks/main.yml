@@ -1,4 +1,9 @@
 ---
 - include: install.yml
+  tags: ['monit-install']
+
 - include: configure.yml
+  tags: ['monit-configure']
+
 - include: services.yml
+  tags: ['monit-services']

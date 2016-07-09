@@ -22,14 +22,17 @@ check host {{ monit_monitor.name }} with address {{ monit_monitor.target }}
 check filesystem {{ monit_monitor.name }} with path {{ monit_monitor.target }}
 {% elif monit_monitor.type == 'file' %}
 check file {{ monit_monitor.name }} with path {{ monit_monitor.target }}
-{% endif -%}
+{% elif monit_monitor.type == 'program' %}
+check program {{ monit_monitor.name }} with path {{ monit_monitor.target }} {%- if monit_monitor.timeout is defined %} with timeout {{monit_monitor.timeout}} seconds{% endif %}
+{% endif %}
 
 {% if monit_monitor.rules is defined %}
 {% for rule in monit_monitor.rules %}
 {% if monit_use_slack %}
-  {{ rule | replace('alert', 'exec ' + monit_slack_script) }}
+    {{ rule | replace('alert', 'exec ' + monit_slack_script) }}
 {% else %}
-  {{ rule }}
+    {{ rule }}
 {% endif %}
 {% endfor %}
+
 {% endif %}

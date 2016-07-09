@@ -1,0 +1,10 @@
+---
+- name: Check if fail2ban is installed
+  register: _monit_check_fail2ban
+  shell: fail2ban-client --version
+  ignore_errors: true
+  changed_when: false
+
+- set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_fail2ban }}'
+  when: _monit_check_fail2ban.rc == 0
