@@ -5,6 +5,7 @@
   ignore_errors: true
   changed_when: false
 
-- set_fact:
+- name: 'Set monit_default_services fact'
+  set_fact:
     monit_default_services: '{{ monit_default_services + monit_service_fail2ban }}'
   when: _monit_check_fail2ban.rc == 0

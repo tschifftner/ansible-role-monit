@@ -2,10 +2,12 @@
 - include: services/exim4.yml
 - include: services/fail2ban.yml
 
-- set_fact:
+- name: 'set facts'
+  set_fact:
     monit_services: '{{ monit_default_services + monit_group_services + monit_host_services }}'
 
-- set_fact:
+- name: 'Set other facts'
+  set_fact:
     active_monit_services: "{{ monit_services | selectattr('name', 'string') | map(attribute='name') | list }}"
 
 - name: 'Get all sevices from file system'

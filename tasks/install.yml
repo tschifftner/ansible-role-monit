@@ -1,19 +1,22 @@
 ---
-- set_fact:
+- name: 'Define facts'
+  set_fact:
     monit_unarchive_dir: '{{ monit_workspace }}/monit-{{ monit_version }}'
     monit_current_version: ''
 
 - name: 'Get current monit version'
-  shell: monit --version
+  command: monit --version
   register: monit_current_version_output
   changed_when: false
   ignore_errors: true
 
-- set_fact:
+- name: 'Define monit_current_version variable'
+  set_fact:
     monit_current_version: "{{ monit_current_version_output.stdout_lines[0] | replace('This is Monit version ', '') }}"
   when: monit_current_version_output.stdout_lines[0] is defined
 
-- debug: msg="{{ monit_version }} != {{ monit_current_version }}"
+- name: 'Output monit_version != monit_current_version'
+  debug: msg="{{ monit_version }} != {{ monit_current_version }}"
 
 - name: 'Create monit workspace'
   file:
@@ -44,7 +47,8 @@
     copy: no
   when: monit_version != monit_current_version
 
-- debug: msg="{{ monit_unarchive }}"
+- name: 'Output monit_unarchive'
+  debug: msg="{{ monit_unarchive }}"
 
 - name: stop monit (if exists) in case of updates
   when: monit_unarchive.changed
@@ -54,7 +58,7 @@
   ignore_errors: true
 
 - name: 'Copy'
-  shell: cp -f {{ monit_unarchive_dir }}/bin/monit /usr/local/bin/monit
+  command: cp -f {{ monit_unarchive_dir }}/bin/monit /usr/local/bin/monit
   when: monit_unarchive.changed
 
 - name: 'Set monit default'

@@ -5,6 +5,7 @@
   ignore_errors: true
   changed_when: false
 
-- set_fact:
+- name: 'Set monit_default_services fact'
+  set_fact:
     monit_default_services: '{{ monit_default_services + monit_service_exim4 }}'
   when: _monit_check_exim.rc == 0
