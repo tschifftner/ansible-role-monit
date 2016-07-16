@@ -67,7 +67,7 @@ ansible webserver -a "monit monitor exim4" --sudo
 
 ## License
 
-MIT / BSD
+[MIT License](http://choosealicense.com/licenses/mit/)
 
 ## Author Information
 
