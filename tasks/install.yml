@@ -112,9 +112,3 @@
     group: root
     mode: 0755
   when: monit_use_slack
-
-- name: start monit
-  service:
-    name: 'monit'
-    state: started
-    enabled: yes

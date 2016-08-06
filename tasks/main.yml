@@ -7,3 +7,9 @@
 
 - include: services.yml
   tags: ['monit-services']
+
+- name: start monit
+  service:
+    name: 'monit'
+    state: started
+    enabled: yes
