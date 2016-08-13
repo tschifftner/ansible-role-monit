@@ -1,0 +1,11 @@
+---
+- name: Check if php5-fpm is installed
+  register: _monit_check_php5_fpm
+  command: php5-fpm -v
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add php5-fpm to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_php5_fpm }}'
+  when: _monit_check_php5_fpm.rc == 0

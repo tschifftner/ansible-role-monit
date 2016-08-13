@@ -1,0 +1,11 @@
+---
+- name: Check if amavisd-new is installed
+  register: _monit_check_amavisd_new
+  command: amavisd-new -V
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add amavisd-new to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_amavisd_new }}'
+  when: _monit_check_amavisd_new.rc == 0

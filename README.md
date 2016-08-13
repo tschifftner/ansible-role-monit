@@ -32,6 +32,29 @@ cycle defines the interval for reminders
 
 None.
 
+# Included tests
+This playbook comes with a lot of tests for standard software and is enabled automatically when found on server:
+
+- amavisd-milter
+- amavisd-new
+- automysqlbackup
+- crontab
+- dovecot
+- exim4
+- fail2ban
+- firewall
+- hetzner-heartbeat (restarts external server when ping fails)
+- mariadb
+- munin-node
+- nginx
+- ntp
+- opendkim
+- php5-fpm
+- postfix
+- softraid
+- ssh
+- sslcertcheck (checks ssl certs and informs on problems)
+
 ## Example Playbook
 
     - hosts: server
@@ -63,6 +86,11 @@ ansible webserver -a "service monit restart" --sudo
 After restarting the failed service must be restored
 ```
 ansible webserver -a "monit monitor exim4" --sudo
+```
+### Test hetzner heartbeat
+```
+iptables -A INPUT -p icmp --icmp-type echo-request -j DROP
+iptables -A OUTPUT -p icmp --icmp-type echo-reply -j DROP
 ```
 
 ## License

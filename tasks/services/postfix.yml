@@ -1,0 +1,11 @@
+---
+- name: Check if postfix is installed
+  register: _monit_check_postfix
+  command: postconf -d | grep mail_version
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add postfix to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_postfix }}'
+  when: _monit_check_postfix.rc == 0

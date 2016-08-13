@@ -1,0 +1,11 @@
+---
+- name: Check if ntp is installed
+  register: _monit_check_ntp
+  command: test -e /usr/sbin/ntpd
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add ntp to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_ntp }}'
+  when: _monit_check_ntp.rc == 0

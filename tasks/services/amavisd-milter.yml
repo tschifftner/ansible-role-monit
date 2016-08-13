@@ -1,0 +1,11 @@
+---
+- name: Check if amavisd-milter is installed
+  register: _monit_check_amavisd_milter
+  command: amavisd-milter -v
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add amavisd-milter to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_amavisd_milter }}'
+  when: _monit_check_amavisd_milter.rc == 0

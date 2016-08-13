@@ -1,0 +1,11 @@
+---
+- name: Check if ssh is installed
+  register: _monit_check_ssh
+  command: ssh -V
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add ssh to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_ssh }}'
+  when: _monit_check_ssh.rc == 0

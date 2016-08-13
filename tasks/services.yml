@@ -1,6 +1,27 @@
 ---
+- include: services/hetzner-heartbeat.yml
 - include: services/exim4.yml
 - include: services/fail2ban.yml
+- include: services/mariadb.yml
+- include: services/automysqlbackup.yml
+- include: services/nginx.yml
+- include: services/php5-fpm.yml
+- include: services/ssh.yml
+- include: services/firewall.yml
+
+- include: services/crontab.yml
+- include: services/ntp.yml
+- include: services/munin-node.yml
+
+- include: services/postfix.yml
+- include: services/dovecot.yml
+- include: services/amavisd-new.yml
+- include: services/amavisd-milter.yml
+- include: services/opendkim.yml
+
+- include: services/sslcertcheck.yml
+- include: services/softraid.yml
+
 
 - name: 'set facts'
   set_fact:

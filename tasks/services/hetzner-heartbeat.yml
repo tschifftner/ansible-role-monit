@@ -1,0 +1,34 @@
+---
+
+- name: 'Generate monit rules'
+  set_fact:
+    name: 'hetzner-heartbeat-{{ item.hostname }}'
+    type: host
+    target: '{{ item.ipv4 }}'
+    rules:
+      - "if failed icmp type echo count 5 with timeout 10 seconds for 3 cycles then exec \"/usr/bin/flock -n /run/restart-{{ item.hostname }}.lock -c '/usr/local/sbin/hetzner_restart.sh {{ item.hostname }} {{ item.ipv4 }}'\""
+  with_items: '{{ monit_hetzner_hosts }}'
+  register: _monit_hetzner_hosts
+  when: >
+    monit_hetzner_heartbeat_enabled and
+    (item.heartbeat is not defined or item.heartbeat == false)
+
+- name: 'Add hetzner heartbeat rules to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services|default([]) + [item.ansible_facts] }}'
+  when: >
+    monit_hetzner_heartbeat_enabled and
+    _monit_hetzner_hosts.results is defined and
+    _monit_hetzner_hosts.results|length and
+    item.ansible_facts is defined and
+    item.ansible_facts|length
+  with_items: '{{ _monit_hetzner_hosts.results }}'
+
+- name: 'Ensure restart script is defined'
+  template:
+    src: hetzner/restart.sh
+    dest: /usr/local/sbin/hetzner_restart.sh
+    owner: root
+    group: root
+    mode: 0750
+  when: monit_hetzner_heartbeat_enabled

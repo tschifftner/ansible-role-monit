@@ -1,0 +1,12 @@
+---
+- name: Check if munin-node is installed
+  register: _monit_check_munin_node
+  command: /usr/sbin/munin-node --help
+  ignore_errors: true
+  changed_when: false
+  no_log: true
+
+- name: 'Add munin-node to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_munin_node }}'
+  when: _monit_check_munin_node.rc == 0

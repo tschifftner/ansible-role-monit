@@ -27,13 +27,47 @@ monit_use_slack: false
 monit_slack_url: 'https://YYYYY.slack.com/services/hooks/incoming-webhook?token=XXXXX'
 
 # Services for all plays
-monit_default_services: []
+monit_default_services:
+  - name: '{{ ansible_hostname }}'
+    type: system
+    target: /var/log/syslog
+    rules:
+      - if loadavg (1min) > 8 for 4 cycles then alert
+      - if loadavg (5min) > 4 for 4 cycles then alert
+      - if memory usage > 75% for 4 cycles then alert
+      - if cpu usage (user) > 70% for 4 cycles then alert
+      - if cpu usage (system) > 30% for 4 cycles then alert
+      -    not every "18-59 5 * * *"
+      -    not every "30-50 6 * * *"
+
+  - name: space_usage
+    type: filesystem
+    target: /
+    rules:
+      - if space usage > 90% then alert
+      - if inode usage > 90% then alert
+
+  - name: syslog
+    type: file
+    target: /var/log/syslog
+    rules:
+      - if timestamp > 65 minutes then alert
+
 
 # Services defined by group vars
 monit_group_services: []
 
 # Services defined by host vars
 monit_host_services: []
+
+# Used for heartbeat and restart script
+monit_hetzner_heartbeat_enabled: false
+monit_hetzner_user: ''
+monit_hetzner_password: ''
+monit_hetzner_uri: 'https://robot-ws.your-server.de/reset'
+monit_hetzner_email: ''
+
+monit_hetzner_hosts: []
 
 # Custom services
 monit_service_fail2ban:
@@ -95,3 +129,339 @@ monit_service_exim4:
       - if failed permission 755 then unmonitor
       - if failed uid root then unmonitor
       - if failed gid root then unmonitor
+
+monit_service_mariadb:
+  - name: mariadb
+    type: process
+    target: /var/run/mysqld/mysqld.pid
+    start: /usr/sbin/service mysql start
+    stop: /usr/sbin/service mysql stop
+    rules:
+      - if failed host 127.0.0.1 port 3306 protocol mysql then restart
+      - if failed unixsocket /var/run/mysqld/mysqld.sock then restart
+      - if 5 restarts within 5 cycles then alert
+      - depends on mariadb_bin, mariadb_service
+
+  - name: mariadb_bin
+    type: file
+    target: /usr/sbin/mysqld
+    start: /usr/sbin/service ssh start
+    stop: /usr/sbin/service ssh stop
+    rules:
+      - if failed checksum then alert
+      - if failed permission 755 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+  - name: mariadb_service
+    type: file
+    target: /lib/systemd/system/mariadb.service
+    start: /usr/sbin/service mysql start
+    stop: /usr/sbin/service mysql stop
+    rules:
+      - if failed checksum then alert
+      - if failed permission 644 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+monit_service_automysqlbackup:
+  - name: automysqlbackup
+    type: file
+    target: /var/backup/db/automysqlbackup_status
+    rules:
+      - if timestamp > 36 hours then alert
+
+monit_service_nginx:
+  - name: nginx
+    type: process
+    target: /var/run/nginx.pid
+    start: /usr/sbin/service nginx start
+    stop: /usr/sbin/service nginx stop
+    rules:
+      - if cpu > 98% for 5 cycles then restart
+      - #   if failed host 127.0.0.1 port 80 protocol http and request /nginx_status with timeout 20 seconds then restart
+      - if 5 restarts within 5 cycles then alert
+      - depends on nginx_bin, nginx_service
+
+  - name: nginx_bin
+    type: file
+    target: /usr/sbin/nginx
+    start: /usr/sbin/service ssh start
+    stop: /usr/sbin/service ssh stop
+    rules:
+      - if failed checksum then alert
+      - if failed permission 755 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+  - name: nginx_service
+    type: file
+    target: /lib/systemd/system/nginx.service
+    rules:
+      - if failed checksum then alert
+      - if failed permission 644 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+monit_service_php5_fpm:
+  - name: php5-fpm
+    type: process
+    target: /var/run/php5-fpm.pid
+    start: /usr/sbin/service php5-fpm start
+    stop: /usr/sbin/service php5-fpm stop
+
+monit_service_dovecot:
+  - name: 'dovecot'
+    type: process
+    target: /var/run/dovecot/master.pid
+    start: /usr/sbin/service postfix start
+    stop: /usr/sbin/service postfix stop
+    rules:
+      - if failed host {{ hostname }} port 993 type tcpssl sslauto protocol imaps for 2 cycles then restart
+      - if failed host {{ hostname }} port 995 type tcpssl sslauto protocol pops for 2 cycles then restart
+      - if failed host {{ hostname }} port 143 protocol imap for 2 cycles then restart
+      - if failed host {{ hostname }} port 110 protocol pop for 2 cycles then restart
+      - if failed unixsocket /var/run/dovecot/auth-userdb for 2 cycles then restart
+      - if failed unixsocket /var/run/dovecot/config for 2 cycles then restart
+      - if failed unixsocket /var/run/dovecot/lmtp for 2 cycles then restart
+      - if failed unixsocket /var/run/dovecot/replicator for 2 cycles then restart
+      - if failed unixsocket /var/run/dovecot/replicator-doveadm for 2 cycles then restart
+      - if failed unixsocket /var/spool/postfix/private/auth for 2 cycles then restart
+      - if failed unixsocket /var/spool/postfix/private/dovecot-lmtp for 2 cycles then restart
+#
+#      if failed host {{ hostname }} port 4040
+#          send "Open, Sesame!\r\n"
+#          expect "Please enter the cave\r\n"
+#          send "Shut, Sesame!\r\n"
+#          expect "See you later [A-Za-z ]+\r\n"
+#      then alert
+#      if 5 restarts within 5 cycles then timeout
+#
+      - if 5 restarts within 5 cycles then alert
+
+monit_service_postfix:
+  - name: 'postfix'
+    type: process
+    target: /var/spool/postfix/pid/master.pid
+    start: /usr/sbin/service postfix start
+    stop: /usr/sbin/service postfix stop
+    rules:
+      #- if failed host {{ hostname }} port 25 protocol smtp username "{{ monit_smtp_testuser }}" password "{{ monit_smtp_testuser_password }}" then restart
+      - if failed host {{ hostname }} port 587 protocol smtps username "{{ monit_smtp_testuser }}" password "{{ monit_smtp_testuser_password }}" then restart
+      - if 5 restarts within 5 cycles then alert
+
+monit_service_opendkim:
+  - name: 'opendkim'
+    type: process
+    target: /var/run/opendkim/opendkim.pid
+    start: /usr/sbin/service opendkim start
+    stop: /usr/sbin/service opendkim stop
+
+monit_service_amavisd_milter:
+  - name: 'amavisd-milter'
+    type: process
+    target: /var/run/amavis/amavisd-milter.pid
+    start: /usr/sbin/service amavisd-milter start
+    stop: /usr/sbin/service amavisd-milter stop
+    rules:
+      - if failed unixsocket /var/run/amavis/amavisd-milter.sock then restart
+      - if 5 restarts within 5 cycles then alert
+
+monit_service_amavisd_new:
+  - name: 'amavisd-new'
+    type: process
+    target: /var/run/amavis/amavisd.pid
+    start: /usr/sbin/service amavisd-new start
+    stop: /usr/sbin/service amavisd-new stop
+    rules:
+      - if failed unixsocket /var/run/amavis/amavisd.sock then restart
+      - if 5 restarts within 5 cycles then alert
+
+monit_service_munin_node:
+  - name: munin-node
+    type: process
+    target: /var/run/munin/munin-node.pid
+    start: /usr/sbin/service munin-node start
+    stop: /usr/sbin/service munin-node stop
+    rules:
+      - depends on munin_service
+
+  - name: munin_service
+    type: file
+    target: /lib/systemd/system/munin-node.service
+    rules:
+      - if failed checksum then alert
+      - if failed permission 644 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+monit_service_ssh:
+  - name: ssh
+    type: process
+    target: /var/run/sshd.pid
+    start: /usr/sbin/service ssh start
+    stop: /usr/sbin/service ssh stop
+    rules:
+      - if failed port 22 protocol ssh then restart
+      - if 5 restarts within 5 cycles then alert
+      - depends on ssh_service
+
+  - name: ssh_service
+    type: file
+    target: /lib/systemd/system/ssh.service
+    rules:
+      - if failed checksum then unmonitor
+      - if failed permission 644 then unmonitor
+      - if failed uid root then unmonitor
+      - if failed gid root then unmonitor
+
+
+monit_service_crontab:
+  - name: crontab
+    type: process
+    target: /var/run/crond.pid
+    start: /usr/sbin/service cron start
+    stop: /usr/sbin/service cron stop
+    rules:
+      - if failed permission 644 then unmonitor
+      - if failed uid root then unmonitor
+      - if failed gid root then unmonitor
+      - depends cron_init, cron_bin
+
+  - name: cron_init
+    type: file
+    target: /lib/systemd/system/cron.service
+    rules:
+      - if failed checksum then unmonitor
+      - if failed permission 644 then unmonitor
+      - if failed uid root then unmonitor
+      - if failed gid root then unmonitor
+
+  - name: cron_bin
+    type: file
+    target: /usr/sbin/cron
+    rules:
+      - if failed checksum then unmonitor
+      - if failed permission 755 then unmonitor
+      - if failed uid root then unmonitor
+      - if failed gid root then unmonitor
+
+monit_service_ntp:
+  - name: ntp
+    type: process
+    target: /var/run/ntpd.pid
+    start: /usr/sbin/service ntp start
+    stop: /usr/sbin/service ntp stop
+    rules:
+      - if failed host 127.0.0.1 port 123 type udp then alert
+      - if 5 restarts within 5 cycles then timeout
+
+monit_service_firewall:
+  - name: firewall.sh
+    type: file
+    target: /usr/local/bin/firewall.sh
+    start: /usr/sbin/service firewall start
+    stop: /usr/sbin/service firewall stop
+    rules:
+      - if failed permission 744 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+      - if size < 400 then alert
+
+  - name: firewall_test_cronjob
+    type: file
+    target: /etc/cron.d/firewall
+    rules:
+      - if failed permission 644 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+  - name: firewall_initd
+    type: file
+    target: /etc/init.d/firewall
+    rules:
+      - if failed permission 755 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+      - if size < 400 then alert
+
+  - name: firewall_systemd
+    type: file
+    target: /lib/systemd/system/firewall.service
+    rules:
+      - if failed permission 644 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+      - if size < 200 then alert
+
+
+monit_service_sslcertcheck:
+  - name: ssl_validate_script
+    type: file
+    target: /usr/local/bin/sslcertcheck.sh
+    rules:
+      - if failed checksum then alert
+      - if failed permission 755 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+  - name: ssl_validate_domains
+    type: file
+    target: /etc/sslcertcheck.txt
+    rules:
+      - if failed permission 444 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+  - name: ssl_validate_log
+    type: file
+    target: /var/log/sslcertcheck.log
+    rules:
+      - if timestamp > 36 hours then alert
+
+  - name: ssl_all_valid
+    type: program
+    target: /usr/bin/sslcertcheck-monit-helper.sh
+    timeout: 300
+    rules:
+      - if status != 0 then alert every 1440 cycles
+
+monit_service_backup:
+  - name: duptools_script
+    type: file
+    target: /usr/local/sbin/duptools
+    rules:
+      - if failed checksum then alert
+      - if failed permission 550 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+  - name: Has backups
+    type: program
+    target: /usr/local/sbin/duptools status
+    timeout: 300
+
+monit_service_softraid:
+  - name: raid
+    type: file
+    target: /proc/mdstat
+    rules:
+      - if match "\[.*_.*\]" then alert
+
+  - name: raid-md0
+    type: program
+    target: "/sbin/mdadm --misc --test /dev/md0"
+    rules:
+      - if status != 0 then alert
+
+  - name: raid-md1
+    type: program
+    target: "/sbin/mdadm --misc --test /dev/md1"
+    rules:
+      - if status != 0 then alert
+
+  - name: raid-md2
+    type: program
+    target: "/sbin/mdadm --misc --test /dev/md2"
+    rules:
+      - if status != 0 then alert

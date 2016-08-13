@@ -1,0 +1,11 @@
+---
+- name: Check if crontab is installed
+  register: _monit_check_crontab
+  command: crontab -l
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add crontab to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_crontab }}'
+  when: _monit_check_crontab.rc == 0

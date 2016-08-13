@@ -1,0 +1,11 @@
+---
+- name: Check if dovecot is installed
+  register: _monit_check_dovecot
+  command: dovecot --version
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add dovecot to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_dovecot }}'
+  when: _monit_check_dovecot.rc == 0

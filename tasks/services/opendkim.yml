@@ -1,0 +1,11 @@
+---
+- name: Check if opendkim is installed
+  register: _monit_check_opendkim
+  command: opendkim -V
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add opendkim to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_opendkim }}'
+  when: _monit_check_opendkim.rc == 0
