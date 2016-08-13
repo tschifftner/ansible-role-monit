@@ -23,7 +23,7 @@ check filesystem {{ monit_monitor.name }} with path {{ monit_monitor.target }}
 {% elif monit_monitor.type == 'file' %}
 check file {{ monit_monitor.name }} with path {{ monit_monitor.target }}
 {% elif monit_monitor.type == 'program' %}
-check program {{ monit_monitor.name }} with path {{ monit_monitor.target }} {%- if monit_monitor.timeout is defined %} with timeout {{monit_monitor.timeout}} seconds{% endif %}
+check program {{ monit_monitor.name }} with path "{{ monit_monitor.target }}" {%- if monit_monitor.timeout is defined %} with timeout {{monit_monitor.timeout}} seconds{% endif %}
 {% endif %}
 
 {% if monit_monitor.rules is defined %}

@@ -68,6 +68,7 @@ monit_hetzner_uri: 'https://robot-ws.your-server.de/reset'
 monit_hetzner_email: ''
 
 monit_hetzner_hosts: []
+monit_hetzner_storageboxes: []
 
 # Custom services
 monit_service_fail2ban:
@@ -463,5 +464,12 @@ monit_service_softraid:
   - name: raid-md2
     type: program
     target: "/sbin/mdadm --misc --test /dev/md2"
+    rules:
+      - if status != 0 then alert
+
+monit_service_duptools:
+  - name: duptools-status
+    type: program
+    target: /usr/local/sbin/duptools_status.sh
     rules:
       - if status != 0 then alert

@@ -10,8 +10,8 @@ hostname=$1
 ip=$2
 user="{{ monit_hetzner_user }}"
 pass="{{ monit_hetzner_password }}"
-uri="{{ monit_hetzner_uri }}"
 email="{{ monit_hetzner_email }}"
+uri="https://robot-ws.your-server.de/reset"
 lockfile="/run/restart_$hostname.lock"
 
 

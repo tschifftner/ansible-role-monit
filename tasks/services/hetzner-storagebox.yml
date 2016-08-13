@@ -1,0 +1,44 @@
+---
+
+- name: 'Generate hetzner storagebox monit rules'
+  set_fact:
+    name: 'storagebox-{{ item }}'
+    type: program
+    target: '/usr/local/sbin/hetzner_storagebox.sh {{ item }}'
+    rules:
+      - 'if status != 0 then alert'
+  with_items: '{{ monit_hetzner_storageboxes }}'
+  register: _monit_hetzner_storageboxes
+  when: monit_hetzner_storageboxes|length
+
+- name: 'Add hetzner storagebox rules to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services|default([]) + [item.ansible_facts] }}'
+  when: >
+    _monit_hetzner_storageboxes.results is defined and
+    _monit_hetzner_storageboxes.results|length and
+    item.ansible_facts is defined and
+    item.ansible_facts|length
+  with_items: '{{ _monit_hetzner_storageboxes.results }}'
+
+- name: Ensure jq is installed
+  apt:
+    pkg: '{{ item }}'
+    state: present
+  when: >
+    _monit_hetzner_storageboxes.results is defined and
+    _monit_hetzner_storageboxes.results|length
+  with_items:
+    - jq
+    - bc
+
+- name: 'Ensure storagebox script is defined'
+  template:
+    src: hetzner/storagebox.sh
+    dest: /usr/local/sbin/hetzner_storagebox.sh
+    owner: root
+    group: root
+    mode: 0750
+  when: >
+    _monit_hetzner_storageboxes.results is defined and
+    _monit_hetzner_storageboxes.results|length

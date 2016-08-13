@@ -1,0 +1,20 @@
+---
+- name: Check if duptools is installed
+  register: _monit_check_duptools
+  command: test -e /usr/local/sbin/duptools
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add duptools to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_duptools }}'
+  when: _monit_check_duptools.rc == 0
+
+- name: 'Ensure duptools status script is defined'
+  template:
+    src: duptools/status.sh
+    dest: /usr/local/sbin/duptools_status.sh
+    owner: root
+    group: root
+    mode: 0750
+  when: _monit_check_duptools.rc == 0

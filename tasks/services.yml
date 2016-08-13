@@ -1,4 +1,6 @@
 ---
+- include: services/hetzner-storagebox.yml
+- include: services/duptools.yml
 - include: services/hetzner-heartbeat.yml
 - include: services/exim4.yml
 - include: services/fail2ban.yml
