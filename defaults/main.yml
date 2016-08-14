@@ -1,6 +1,6 @@
 ---
 # Download
-monit_version: "5.17.1"
+monit_version: "5.19.0"
 monit_download_url: 'https://bitbucket.org/tildeslash/monit/downloads/monit-{{ monit_version }}-linux-x64.tar.gz'
 
 # Mailserver
@@ -14,6 +14,8 @@ monit_webinterface_bind: 0.0.0.0
 monit_webinterface_port: 2812
 monit_webinterface_acl_rules:
   - "admin:monit"
+monit_ssl_certificate: ''
+monit_ssl_certificate_key: ''
 
 # Alerts
 monit_alert_address: ''
@@ -32,11 +34,11 @@ monit_default_services:
     type: system
     target: /var/log/syslog
     rules:
-      - if loadavg (1min) > 8 for 4 cycles then alert
-      - if loadavg (5min) > 4 for 4 cycles then alert
-      - if memory usage > 75% for 4 cycles then alert
-      - if cpu usage (user) > 70% for 4 cycles then alert
-      - if cpu usage (system) > 30% for 4 cycles then alert
+      - if loadavg (1min) > 8 for 10 cycles then alert
+      - if loadavg (5min) > 4 for 10 cycles then alert
+      - if memory usage > 85% for 10 cycles then alert
+      - if cpu usage (user) > 70% for 10 cycles then alert
+      - if cpu usage (system) > 30% for 10 cycles then alert
       -    not every "18-59 5 * * *"
       -    not every "30-50 6 * * *"
 
@@ -324,7 +326,6 @@ monit_service_crontab:
     start: /usr/sbin/service cron start
     stop: /usr/sbin/service cron stop
     rules:
-      - if failed permission 644 then unmonitor
       - if failed uid root then unmonitor
       - if failed gid root then unmonitor
       - depends cron_init, cron_bin
@@ -425,22 +426,8 @@ monit_service_sslcertcheck:
     target: /usr/bin/sslcertcheck-monit-helper.sh
     timeout: 300
     rules:
-      - if status != 0 then alert every 1440 cycles
-
-monit_service_backup:
-  - name: duptools_script
-    type: file
-    target: /usr/local/sbin/duptools
-    rules:
-      - if failed checksum then alert
-      - if failed permission 550 then alert
-      - if failed uid root then alert
-      - if failed gid root then alert
-
-  - name: Has backups
-    type: program
-    target: /usr/local/sbin/duptools status
-    timeout: 300
+      - if status != 0 then alert every 120 cycles
+      -    not every "* 1-7 * * *"
 
 monit_service_softraid:
   - name: raid
@@ -472,4 +459,5 @@ monit_service_duptools:
     type: program
     target: /usr/local/sbin/duptools_status.sh
     rules:
-      - if status != 0 then alert
+      - if status != 0 for 5 cycles then alert every 30 cycles
+      -    not every "* 0-7 * * *"

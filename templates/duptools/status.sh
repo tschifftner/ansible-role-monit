@@ -16,7 +16,7 @@ fi
 
 
 duptools=`which duptools`
-tmpFile=/tmp/.duptools_status
+tmpFile=/root/.duptools_status
 
 if [ ! -f $duptools ]; then echo "duptools not found"; exit 1; fi
 

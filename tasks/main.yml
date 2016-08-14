@@ -2,6 +2,9 @@
 - include: install.yml
   tags: ['monit-install']
 
+- include: ssl.yml
+  tags: ['monit-ssl']
+
 - include: configure.yml
   tags: ['monit-configure']
 

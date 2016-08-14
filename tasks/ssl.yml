@@ -1,0 +1,23 @@
+---
+
+- name: Generate dhparam.pem if it does not exist
+  no_log: true
+  shell: openssl dhparam 2048 -out /etc/monit/dhparam.pem
+  args:
+    creates: '/etc/monit/dhparam.pem'
+  tags: ['skip_ansible_lint']
+
+- name: Read dhparam
+  command: cat /etc/monit/dhparam.pem
+  register: monit_ssl_dhparam
+
+- name: Generate monit.pem
+  no_log: true
+  notify: check and restart monit
+  template:
+    src: 'ssl/certificate.pem'
+    dest: '/etc/monit/certificate.pem'
+    owner: root
+    group: root
+    mode: 0700
+  when: monit_ssl_certificate != '' and monit_ssl_certificate_key != ''
