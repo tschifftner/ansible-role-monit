@@ -1,7 +1,7 @@
 ---
 - name: Check if crontab is installed
   register: _monit_check_crontab
-  command: crontab -l
+  command: test -e /lib/systemd/system/cron.service
   ignore_errors: true
   changed_when: false
 
