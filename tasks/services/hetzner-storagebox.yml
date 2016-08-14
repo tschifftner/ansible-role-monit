@@ -6,7 +6,7 @@
     type: program
     target: '/usr/local/sbin/hetzner_storagebox.sh {{ item }}'
     rules:
-      - 'if status != 0 then alert'
+      - 'if status != 0 then alert every 60 cycles'
   with_items: '{{ monit_hetzner_storageboxes }}'
   register: _monit_hetzner_storageboxes
   when: monit_hetzner_storageboxes|length
