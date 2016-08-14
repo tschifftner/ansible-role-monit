@@ -28,6 +28,14 @@ monit_alert_addresses:
 
 cycle defines the interval for reminders
 
+## Configure SSL
+
+Add certificate and certificate key to
+```
+monit_ssl_certificate: ''
+monit_ssl_certificate_key: ''
+```
+
 ## Dependencies
 
 None.
