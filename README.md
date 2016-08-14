@@ -81,11 +81,11 @@ This playbook comes with a lot of tests for standard software and is enabled aut
 ## Ad-hoc commands
 After checksum failing ansible can be used to restart monit
 ```
-ansible webserver -a "service monit restart" --sudo
+ansible all -a "service monit restart" --become
 ```
 After restarting the failed service must be restored
 ```
-ansible webserver -a "monit monitor exim4" --sudo
+ansible all -a "monit monitor exim4" --become
 ```
 ### Test hetzner heartbeat
 ```
