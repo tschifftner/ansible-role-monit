@@ -11,24 +11,29 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 
+# Do not let duplicity run more than once
+[ `ps axu | grep -v "grep" | grep --count "duplicity"` -gt 0 ] && echo "duplicity busy" && exit 1
+
+
 duptools=`which duptools`
+tmpFile=/tmp/.duptools_status
 
 if [ ! -f $duptools ]; then echo "duptools not found"; exit 1; fi
 
-status=`$duptools status`
+$duptools status > $tmpFile
 
-echo $status | grep "Found primary backup chain with matching signature chain" > /dev/null
+grep "Found primary backup chain with matching signature chain" $tmpFile > /dev/null
 if [[ $? != 0 ]]; then echo "No backup found"; exit 1; fi
 
-echo $status | grep "No orphaned or incomplete backup sets found" > /dev/null
+grep "No orphaned or incomplete backup sets found" $tmpFile > /dev/null
 if [[ $? != 0 ]]; then echo "Orphaned or incomplete backup found"; exit 1; fi
 
-lastBackup=`echo $status | grep -oP "Chain end time:(.*)Number"`
-lastBackup=`date -d "${lastBackup:15:25}" +%s`
+lastBackup=`grep -E "Chain end time:" $tmpFile | tail -1 | sed -r 's/Chain end time\: \s*(.*?)\s*$/\1/'`
+lastBackupDate=`date -d "${lastBackup}" +%s`
 today=`date "+%s"`
-diff=$(($lastBackup-$today))
+diff=$(($today-$lastBackupDate))
 days=$(($diff/(60*60*24)))
 
-if [[ $days > 1 ]]; then echo "Last backup is too old"; exit 1; fi
+if [[ $days > 1 ]]; then echo "Last backup is too old ($days days)"; exit 1; fi
 
 echo "Last backup $days days ago"
