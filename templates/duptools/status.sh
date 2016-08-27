@@ -14,6 +14,8 @@ fi
 # Do not let duplicity run more than once
 [ `ps axu | grep -v "grep" | grep --count "duplicity"` -gt 0 ] && echo "duplicity busy" && exit 1
 
+# Remove lockfile if exists
+find /root/.cache/duplicity/ -name 'lockfile.lock' -exec rm -rf {} \;
 
 duptools=`which duptools`
 tmpFile=/root/.duptools_status
