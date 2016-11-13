@@ -8,6 +8,7 @@
 - include: services/automysqlbackup.yml
 - include: services/nginx.yml
 - include: services/php5-fpm.yml
+- include: services/php7-fpm.yml
 - include: services/ssh.yml
 - include: services/firewall.yml
 

@@ -220,6 +220,13 @@ monit_service_php5_fpm:
     start: /usr/sbin/service php5-fpm start
     stop: /usr/sbin/service php5-fpm stop
 
+monit_service_php7_fpm:
+  - name: php7.0-fpm
+    type: process
+    target: /var/run/php7-fpm.pid
+    start: /usr/sbin/service php7.0-fpm start
+    stop: /usr/sbin/service php7.0-fpm stop
+
 monit_service_dovecot:
   - name: 'dovecot'
     type: process
