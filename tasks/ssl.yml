@@ -5,7 +5,8 @@
   shell: openssl dhparam 2048 -out /etc/monit/dhparam.pem
   args:
     creates: '/etc/monit/dhparam.pem'
-  async: 120
+  async: 300
+  poll: 5
   tags: ['skip_ansible_lint']
 
 - name: Read dhparam

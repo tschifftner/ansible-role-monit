@@ -56,10 +56,12 @@
     name: 'monit'
     state: stopped
   ignore_errors: true
+  tags: ['skip_ansible_lint']
 
 - name: 'Copy'
   command: cp -f {{ monit_unarchive_dir }}/bin/monit /usr/local/bin/monit
   when: monit_unarchive.changed
+  tags: ['skip_ansible_lint']
 
 - name: 'Set monit default'
   copy:
