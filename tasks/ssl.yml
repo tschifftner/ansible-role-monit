@@ -1,5 +1,10 @@
 ---
 
+- name: Ensure /etc/monit exists
+  file:
+    path: /etc/monit
+    state: directory
+
 - name: Generate dhparam.pem if it does not exist
   no_log: true
   shell: openssl dhparam 2048 -out /etc/monit/dhparam.pem
