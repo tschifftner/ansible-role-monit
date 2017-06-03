@@ -14,6 +14,7 @@
   set_fact:
     monit_current_version: "{{ monit_current_version_output.stdout_lines[0] | replace('This is Monit version ', '') }}"
   when: monit_current_version_output.stdout_lines[0] is defined
+  ignore_errors: true
 
 - name: 'Output monit_version != monit_current_version'
   debug: msg="{{ monit_version }} != {{ monit_current_version }}"
