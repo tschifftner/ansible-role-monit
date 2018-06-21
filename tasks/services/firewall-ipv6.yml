@@ -1,0 +1,11 @@
+---
+- name: Check if firewall-ipv6 is installed
+  register: _monit_check_firewall_ipv6
+  command: test -e /usr/local/bin/firewall-ipv6.sh
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add firewall-ipv6 to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_firewall_ipv6 }}'
+  when: _monit_check_firewall.rc == 0
