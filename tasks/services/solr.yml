@@ -1,0 +1,11 @@
+---
+- name: Check if solr is installed
+  register: _monit_check_solr
+  command: test -e /var/solr/data/
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add solr to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_solr }}'
+  when: _monit_check_solr.rc == 0

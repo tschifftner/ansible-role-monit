@@ -1,6 +1,6 @@
 ---
 # Download
-monit_version: "5.20.0"
+monit_version: "5.25.1"
 monit_download_url: 'https://bitbucket.org/tildeslash/monit/downloads/monit-{{ monit_version }}-linux-x64.tar.gz'
 
 # Mailserver
@@ -27,6 +27,9 @@ mmonit_collector: ''
 # If endabled, all alerts are send to slack
 monit_use_slack: false
 monit_slack_url: 'https://YYYYY.slack.com/services/hooks/incoming-webhook?token=XXXXX'
+
+monit_smtp_testuser: 'test@example.com'
+monit_smtp_testuser_password: 'f5G9S23PvkdEASd0oL3'
 
 # Services for all plays
 monit_default_services:
@@ -155,8 +158,8 @@ monit_service_mariadb:
   - name: mariadb_bin
     type: file
     target: /usr/sbin/mysqld
-    start: /usr/sbin/service ssh start
-    stop: /usr/sbin/service ssh stop
+    start: /usr/sbin/service mysql start
+    stop: /usr/sbin/service mysql stop
     rules:
       - if failed checksum then alert
       - if failed permission 755 then alert
@@ -196,8 +199,8 @@ monit_service_nginx:
   - name: nginx_bin
     type: file
     target: /usr/sbin/nginx
-    start: /usr/sbin/service ssh start
-    stop: /usr/sbin/service ssh stop
+    start: /usr/sbin/service nginx start
+    stop: /usr/sbin/service nginx stop
     rules:
       - if failed checksum then alert
       - if failed permission 755 then alert
@@ -410,6 +413,44 @@ monit_service_firewall:
       - if failed gid root then alert
       - if size < 200 then alert
 
+monit_service_firewall_ipv6:
+  - name: firewall-ipv6.sh
+    type: file
+    target: /usr/local/bin/firewall-ipv6.sh
+    start: /usr/sbin/service firewall-ipv6 start
+    stop: /usr/sbin/service firewall-ipv6 stop
+    rules:
+      - if failed permission 744 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+      - if size < 400 then alert
+
+  - name: firewall_ipv6_test_cronjob
+    type: file
+    target: /etc/cron.d/firewall_ipv6
+    rules:
+      - if failed permission 644 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+
+  - name: firewall_ipv6_initd
+    type: file
+    target: /etc/init.d/firewall-ipv6
+    rules:
+      - if failed permission 755 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+      - if size < 400 then alert
+
+  - name: firewall_ipv6_systemd
+    type: file
+    target: /lib/systemd/system/firewall-ipv6.service
+    rules:
+      - if failed permission 644 then alert
+      - if failed uid root then alert
+      - if failed gid root then alert
+      - if size < 200 then alert
+
 
 monit_service_sslcertcheck:
   - name: ssl_validate_script
@@ -475,3 +516,12 @@ monit_service_duptools:
     rules:
       - if status != 0 for 5 cycles then alert every {{ [24,25,26,27,28,29,30,31,32,33,34,35,36]|random }} cycles
       -    not every "* 0-9 * * *"
+
+monit_service_solr:
+  - name: solr
+    type: process
+    target: /var/solr/solr-8983.pid
+    start: /usr/sbin/service solr start
+    stop: /usr/sbin/service solr stop
+    rules:
+      - if failed port 8983 protocol http for 3 cycles then start
