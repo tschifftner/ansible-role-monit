@@ -6,13 +6,8 @@
     state: directory
 
 - name: Generate dhparam.pem if it does not exist
-  no_log: true
-  shell: openssl dhparam -out /etc/monit/dhparam.pem 2048
-  args:
-    creates: /etc/monit/dhparam.pem
-  async: 300
-  poll: 5
-  tags: ['skip_ansible_lint']
+  openssl_dhparam:
+    path: /etc/monit/dhparam.pem
 
 - name: Read dhparam
   command: cat /etc/monit/dhparam.pem
