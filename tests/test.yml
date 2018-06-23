@@ -3,6 +3,7 @@
   remote_user: root
 
   vars:
+    monit_dhparam_size: 8
     monit_services:
       - name: ssh
         type: process
