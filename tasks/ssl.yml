@@ -9,6 +9,7 @@
   openssl_dhparam:
     path: /etc/monit/dhparam.pem
     size: '{{ monit_dhparam_size }}'
+  changed_when: false
 
 - name: Read dhparam
   command: cat /etc/monit/dhparam.pem
