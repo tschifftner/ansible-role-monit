@@ -31,6 +31,8 @@ monit_slack_url: 'https://YYYYY.slack.com/services/hooks/incoming-webhook?token=
 monit_smtp_testuser: 'test@example.com'
 monit_smtp_testuser_password: 'f5G9S23PvkdEASd0oL3'
 
+monit_dhparam_size: 4096
+
 # Services for all plays
 monit_default_services:
   - name: '{{ ansible_hostname }}'
