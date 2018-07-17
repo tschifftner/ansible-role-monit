@@ -50,6 +50,7 @@ This playbook comes with a lot of tests for standard software and is enabled aut
 - automysqlbackup
 - crontab
 - dovecot
+- duptools
 - exim4
 - fail2ban
 - filesystem
