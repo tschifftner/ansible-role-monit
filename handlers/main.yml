@@ -21,12 +21,6 @@
   systemd:
     daemon_reload: yes
 
-- name: reload initctl
-  service:
-    name: initctl
-    state: reloaded
-#  command: initctl reload-configuration
-
 - name: check and restart monit
   shell: "monit -t | grep 'Control file syntax OK'"
   notify: restart monit
