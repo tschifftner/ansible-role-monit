@@ -77,6 +77,15 @@
     group: root
     mode: 0644
 
+- name: Ensure init/upstart directories exist
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '/etc/init.d'
+    - '/etc/init'
+  when: ansible_distribution == 'Ubuntu'
+
 - name: 'Set init script'
   copy:
     src: monit.initd
@@ -93,7 +102,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: reload initctl
+  notify: reload systemd
   when: ansible_distribution == 'Ubuntu'
 
 - name: 'Set systemd unit file'
