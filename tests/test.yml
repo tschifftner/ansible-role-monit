@@ -21,4 +21,4 @@
           - if timestamp > 65 minutes then alert
 
   roles:
-    - ansible-role-monit
+    - role_under_test
