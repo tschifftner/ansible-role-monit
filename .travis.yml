@@ -30,8 +30,13 @@ script:
   # Check if monit is reachable
   - ${DOCKER} curl http://admin:monit@127.0.0.1:2812/
 
+  - ${DOCKER} monit --version
+  - ${DOCKER} monit summary | grep 'Service Name'
+
 after_failure:
   - ${DOCKER} service monit status
+  - ${DOCKER} monit --version
+  - ${DOCKER} monit summary
   - ${DOCKER} monit status
   - ${DOCKER} monit validate
   - ${DOCKER} cat /etc/default/monit
