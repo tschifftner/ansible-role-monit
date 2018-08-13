@@ -232,6 +232,13 @@ monit_service_php7_fpm:
     start: /usr/sbin/service php7.0-fpm start
     stop: /usr/sbin/service php7.0-fpm stop
 
+monit_service_redis_server:
+  - name: redis-server
+    type: process
+    target: /var/run/redis/redis-server.pid
+    start: /usr/sbin/service redis-server start
+    stop: /usr/sbin/service redis-server stop
+
 monit_service_dovecot:
   - name: 'dovecot'
     type: process
