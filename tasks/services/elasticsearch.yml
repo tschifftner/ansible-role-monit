@@ -1,0 +1,11 @@
+---
+- name: Check if elasticsearch is installed
+  register: _monit_check_elasticsearch
+  command: test -e /var/lib/elasticsearch
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add elasticsearch to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_elasticsearch }}'
+  when: _monit_check_elasticsearch.rc == 0

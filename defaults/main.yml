@@ -225,12 +225,26 @@ monit_service_php5_fpm:
     start: /usr/sbin/service php5-fpm start
     stop: /usr/sbin/service php5-fpm stop
 
-monit_service_php7_fpm:
+monit_service_php70_fpm:
   - name: php7.0-fpm
     type: process
-    target: /var/run/php7-fpm.pid
+    target: /var/run/php7.0-fpm.pid
     start: /usr/sbin/service php7.0-fpm start
     stop: /usr/sbin/service php7.0-fpm stop
+
+monit_service_php71_fpm:
+  - name: php7.1-fpm
+    type: process
+    target: /var/run/php7.1-fpm.pid
+    start: /usr/sbin/service php7.1-fpm start
+    stop: /usr/sbin/service php7.1-fpm stop
+
+monit_service_redis_server:
+  - name: redis-server
+    type: process
+    target: /var/run/redis/redis-server.pid
+    start: /usr/sbin/service redis-server start
+    stop: /usr/sbin/service redis-server stop
 
 monit_service_dovecot:
   - name: 'dovecot'
@@ -526,4 +540,13 @@ monit_service_solr:
     start: /usr/sbin/service solr start
     stop: /usr/sbin/service solr stop
     rules:
-      - if failed port 8983 protocol http for 3 cycles then start
+      - if failed port 8983 protocol http for 3 cycles then restart
+
+monit_service_elasticsearch:
+  - name: elasticsearch
+    type: process
+    target: /var/run/elasticsearch/elasticsearch.pid
+    start: /usr/sbin/service elasticsearch start
+    stop: /usr/sbin/service elasticsearch stop
+    rules:
+      - if failed host 127.0.0.1 port 9200 protocol http for 3 cycles then restart
