@@ -1,0 +1,11 @@
+---
+- name: Check if php7.1-fpm is installed
+  register: _monit_check_php71_fpm
+  command: php-fpm7.1 -v
+  ignore_errors: true
+  changed_when: false
+
+- name: 'Add php7.1-fpm to monit_default_services fact'
+  set_fact:
+    monit_default_services: '{{ monit_default_services + monit_service_php71_fpm }}'
+  when: _monit_check_php71_fpm.rc == 0
